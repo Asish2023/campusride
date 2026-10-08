@@ -25,6 +25,17 @@ async function loadListings() {
 }
 
 
+function escapeHtml(value) {
+    if (value === null || value === undefined) return "";
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
 // --------------------------------
 // Display listings
 // --------------------------------
@@ -60,14 +71,17 @@ function displayListings(listings) {
             emoji = "🛵";
         }
 
+        const imageContent = (item.image_url && item.image_url.trim() !== "")
+            ? `<img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.title)}" style="width: 100%; height: 100%; object-fit: cover;">`
+            : emoji;
 
         return `
 
             <div class="card">
 
-                <div class="card-image">
+                <div class="card-image" style="overflow: hidden;">
 
-                    ${emoji}
+                    ${imageContent}
 
                 </div>
 
@@ -76,13 +90,13 @@ function displayListings(listings) {
 
                     <div class="card-category">
 
-                        ${item.category}
+                        ${escapeHtml(item.category)}
 
                     </div>
 
 
                     <h3>
-                        ${item.title}
+                        ${escapeHtml(item.title)}
                     </h3>
 
 
@@ -96,14 +110,14 @@ function displayListings(listings) {
                     <div class="condition">
 
                         Condition:
-                        ${item.condition}
+                        ${escapeHtml(item.condition)}
 
                     </div>
 
 
                     <button
                         class="view-btn"
-                        onclick="viewListing(${item.id})"
+                        onclick="viewListing(${Number(item.id)})"
                     >
 
                         View Details
@@ -127,7 +141,7 @@ function displayListings(listings) {
 function viewListing(id) {
 
     window.location.href =
-        `/static/listing.html?id=${id}`;
+        `/listing.html?id=${id}`;
 
 }
 

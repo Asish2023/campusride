@@ -60,11 +60,12 @@ function showLoggedInUser() {
     const accountElement = document.getElementById("accountName");
 
     if (accountElement && user) {
-        accountElement.textContent = user.name;
+        accountElement.textContent = `👋 ${user.name}`;
     }
 
     const loginLink = document.getElementById("loginLink");
     const logoutButton = document.getElementById("logoutButton");
+    const sellerDashboardLink = document.getElementById("sellerDashboardLink") || document.getElementById("sellerLink");
 
     if (user) {
         if (loginLink) {
@@ -74,6 +75,14 @@ function showLoggedInUser() {
         if (logoutButton) {
             logoutButton.style.display = "inline-block";
         }
+
+        if (sellerDashboardLink) {
+            if (user.role === "seller") {
+                sellerDashboardLink.style.display = "inline-block";
+            } else {
+                sellerDashboardLink.style.display = "none";
+            }
+        }
     } else {
         if (loginLink) {
             loginLink.style.display = "inline-block";
@@ -81,6 +90,10 @@ function showLoggedInUser() {
 
         if (logoutButton) {
             logoutButton.style.display = "none";
+        }
+
+        if (sellerDashboardLink) {
+            sellerDashboardLink.style.display = "none";
         }
     }
 }

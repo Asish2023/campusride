@@ -4,6 +4,16 @@ if (!currentUser) {
     throw new Error("Seller authentication required.");
 }
 
+function escapeHtml(value) {
+    if (value === null || value === undefined) return "";
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 async function loadSellerDashboard() {
 
     try {
@@ -12,6 +22,10 @@ async function loadSellerDashboard() {
             await fetch(
                 `/my-listings?student_id=${encodeURIComponent(currentUser.student_id)}`
             );
+
+        if (!response.ok) {
+            throw new Error("Could not load your listings");
+        }
 
         const listings =
             await response.json();
@@ -25,6 +39,10 @@ async function loadSellerDashboard() {
     } catch (error) {
 
         console.error(error);
+        const container = document.getElementById("myListings");
+        if (container) {
+            container.innerHTML = "<p>Error loading listings. Please refresh.</p>";
+        }
 
     }
 
@@ -44,7 +62,7 @@ function displayListings(listings) {
     if (listings.length === 0) {
 
         container.innerHTML =
-            "<p>No listings yet.</p>";
+            "<p>You haven't posted any listings yet. Click <strong>+ Sell Something</strong> to add one!</p>";
 
         return;
     }
@@ -60,11 +78,11 @@ function displayListings(listings) {
                     <div>
 
                         <h3>
-                            ${item.title}
+                            ${escapeHtml(item.title)}
                         </h3>
 
                         <p>
-                            ${item.category}
+                            ${escapeHtml(item.category)}
                         </p>
 
                         <strong>
@@ -74,15 +92,16 @@ function displayListings(listings) {
 
                         <p>
                             Condition:
-                            ${item.condition}
+                            ${escapeHtml(item.condition)}
                         </p>
 
                     </div>
 
 
                     <a
-                        href="/listing.html?id=${item.id}"
+                        href="/listing.html?id=${Number(item.id)}"
                         class="view-btn"
+                        style="text-decoration: none;"
                     >
                         View Listing
                     </a>
@@ -110,30 +129,36 @@ async function loadOffers(listings) {
 
     for (const listing of listings) {
 
-        const response =
-            await fetch(
-                `/messages/${listing.id}`
-            );
+        try {
+            const response =
+                await fetch(
+                    `/messages/${listing.id}`
+                );
 
-        const messages =
-            await response.json();
+            if (!response.ok) continue;
+
+            const messages =
+                await response.json();
 
 
-        messages.forEach(message => {
+            messages.forEach(message => {
 
-            if (message.offer_price) {
+                if (message.offer_price) {
 
-                allOffers.push({
+                    allOffers.push({
 
-                    listing: listing,
+                        listing: listing,
 
-                    offer: message
+                        offer: message
 
-                });
+                    });
 
-            }
+                }
 
-        });
+            });
+        } catch (err) {
+            console.error("Error loading offers for listing:", listing.id, err);
+        }
 
     }
 
@@ -158,12 +183,12 @@ async function loadOffers(listings) {
                 <div class="offer-card">
 
                     <h3>
-                        ${item.listing.title}
+                        ${escapeHtml(item.listing.title)}
                     </h3>
 
                     <p>
                         Buyer:
-                        ${item.offer.sender}
+                        <strong>${escapeHtml(item.offer.sender)}</strong>
                     </p>
 
                     <div class="buyer-offer">
@@ -175,14 +200,16 @@ async function loadOffers(listings) {
                     </div>
 
                     <p>
-                        ${item.offer.message}
+                        ${escapeHtml(item.offer.message)}
                     </p>
 
-                    <button
-                        onclick="alert('Counter-offer feature next!')"
+                    <a
+                        href="/listing.html?id=${Number(item.listing.id)}"
+                        class="view-btn"
+                        style="display: inline-block; margin-top: 10px; text-decoration: none; width: auto; padding: 10px 18px;"
                     >
-                        Counter Offer
-                    </button>
+                        Reply / Open Chat
+                    </a>
 
                 </div>
 

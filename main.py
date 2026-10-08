@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import sqlite3
 import os
@@ -10,6 +11,14 @@ import secrets
 import re
 
 app = FastAPI(title="CampusRide")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 ADMIN_KEY = os.getenv("CAMPUSRIDE_ADMIN_KEY", "campusride-admin-2026")
 
@@ -24,8 +33,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # =============================
 
 def get_db():
-    conn = sqlite3.connect("campusride.db")
+    conn = sqlite3.connect("campusride.db", timeout=10.0)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
     return conn
 
 
@@ -419,7 +429,7 @@ def login_student(data: LoginRequest):
 # =============================
 
 def check_admin(admin_key: str):
-    if admin_key != ADMIN_KEY:
+    if not secrets.compare_digest(admin_key, ADMIN_KEY):
         raise HTTPException(
             status_code=401,
             detail="Invalid admin key."
@@ -504,7 +514,7 @@ def reject_user(
     conn = get_db()
 
     user = conn.execute(
-        "SELECT id FROM users WHERE id = ?",
+        "SELECT id, id_card_path, admission_slip_path, passport_photo_path FROM users WHERE id = ?",
         (user_id,)
     ).fetchone()
 
@@ -515,6 +525,15 @@ def reject_user(
             status_code=404,
             detail="User not found."
         )
+
+    # Clean up uploaded verification files from disk
+    for path_key in ["id_card_path", "admission_slip_path", "passport_photo_path"]:
+        file_path = user[path_key]
+        if file_path and os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except Exception:
+                pass
 
     conn.execute(
         "DELETE FROM users WHERE id = ?",
@@ -654,7 +673,12 @@ async def upload_image(file: UploadFile = File(...)):
             detail="Image must be smaller than 5 MB."
         )
 
-    extension = os.path.splitext(file.filename)[1]
+    extension = os.path.splitext(file.filename or "")[1].lower()
+    if extension not in [".jpg", ".jpeg", ".png", ".webp"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid image file extension."
+        )
 
     filename = f"{uuid.uuid4()}{extension}"
 
@@ -823,3 +847,9 @@ def get_messages(listing_id: int):
     conn.close()
 
     return [dict(message) for message in messages]
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8080))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

@@ -24,7 +24,11 @@
                 Marketplace
             </a>
 
-            <span id="accountName"></span>
+            <a href="/seller.html" id="sellerDashboardLink" style="display: none;">
+                Seller Dashboard
+            </a>
+
+            <span id="accountName" style="font-weight: bold;"></span>
 
             <a href="/login.html" id="loginLink">
                 My Account
@@ -69,7 +73,7 @@
                 through hundreds of WhatsApp messages.
             </p>
 
-            <button class="primary-btn">
+            <button class="primary-btn" onclick="document.querySelector('.market-header').scrollIntoView({behavior: 'smooth'})">
                 Browse Marketplace
             </button>
 

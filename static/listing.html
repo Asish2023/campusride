@@ -30,11 +30,11 @@
                 Marketplace
             </a>
 
-            <a href="#">
-                My Chats
+            <a href="/seller.html" id="sellerLink" style="display: none;">
+                Seller Dashboard
             </a>
 
-            <button class="sell-btn">
+            <button class="sell-btn" onclick="window.location.href='/sell.html'">
                 + Sell Something
             </button>
 
@@ -67,574 +67,302 @@
     </main>
 
 
+    <script src="/static/auth.js"></script>
     <script>
+        const params = new URLSearchParams(window.location.search);
+        const listingId = params.get("id");
+        let currentListing = null;
 
-        // Get ID from URL
-        // Example:
-        // /listing.html?id=1
+        function escapeHtml(value) {
+            if (value === null || value === undefined) return "";
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
-        const params =
-            new URLSearchParams(window.location.search);
-
-        const listingId =
-            params.get("id");
-
-        // ============================
-        // CHAT
-        // ============================
+        function getSenderName() {
+            const user = (typeof getCurrentUser === "function") ? getCurrentUser() : null;
+            if (!user) return "Buyer";
+            if (currentListing && user.student_id === currentListing.seller_student_id) {
+                return `${user.name} (Seller)`;
+            }
+            return user.name;
+        }
 
         async function loadMessages() {
+            if (!listingId) return;
+            const container = document.getElementById("messages");
+            if (!container) return;
 
             try {
-
-                const response =
-                    await fetch(`/messages/${listingId}`);
-
-                const messages =
-                    await response.json();
-
-                const container =
-                    document.getElementById("messages");
-
+                const response = await fetch(`/messages/${listingId}`);
+                if (!response.ok) return;
+                const messages = await response.json();
 
                 if (messages.length === 0) {
-
                     container.innerHTML = `
-                        <p class="no-messages">
-                            No messages yet.
-                            Start the conversation!
+                        <p class="no-messages" style="color:#777; text-align:center; padding:20px;">
+                            No messages yet. Start the conversation!
                         </p>
                     `;
-
                     return;
                 }
 
+                const user = (typeof getCurrentUser === "function") ? getCurrentUser() : null;
 
                 container.innerHTML = messages.map(msg => {
-
-                    const isBuyer =
-                        msg.sender === "buyer";
+                    const isSeller = msg.sender.includes("(Seller)");
+                    const isMe = user && (msg.sender === user.name || msg.sender === `${user.name} (Seller)`);
 
                     return `
-                        <div class="message ${
-                            isBuyer
-                                ? "buyer-message"
-                                : "seller-message"
-                        }">
-
-                            <strong>
-                                ${isBuyer ? "You" : "Seller"}
-                            </strong>
-
-                            <p>
-                                ${msg.message}
-                            </p>
-
+                        <div class="message ${isMe ? "buyer-message" : "seller-message"}">
+                            <strong>${escapeHtml(msg.sender)}</strong>
+                            <p>${escapeHtml(msg.message)}</p>
                             ${
                                 msg.offer_price
-                                ?
-                                `<div>
-                                    💰 Offer:
-                                    ₹${Number(msg.offer_price)
-                                        .toLocaleString("en-IN")}
-                                </div>`
-                                :
-                                ""
+                                ? `<div style="margin-top:6px; font-weight:bold; color:#166534;">
+                                    💰 Offer: ₹${Number(msg.offer_price).toLocaleString("en-IN")}
+                                   </div>`
+                                : ""
                             }
-
                         </div>
                     `;
-
                 }).join("");
 
-
-                container.scrollTop =
-                    container.scrollHeight;
-
-
+                container.scrollTop = container.scrollHeight;
             } catch (error) {
-
-                console.error(error);
-
+                console.error("Error loading messages:", error);
             }
-
         }
-
-
-        // ============================
-        // SEND MESSAGE
-        // ============================
 
         async function sendMessage() {
+            const input = document.getElementById("messageInput");
+            if (!input) return;
+            const message = input.value.trim();
+            if (!message) return;
 
-            const input =
-                document.getElementById("messageInput");
-
-            const message =
-                input.value.trim();
-
-
-            if (!message) {
-                return;
-            }
-
+            const sender = getSenderName();
 
             try {
-
-                const response =
-                    await fetch("/messages", {
-
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-
-                            listing_id:
-                                Number(listingId),
-
-                            sender:
-                                "buyer",
-
-                            message:
-                                message,
-
-                            offer_price:
-                                null
-                        })
-
-                    });
-
+                const response = await fetch("/messages", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        listing_id: Number(listingId),
+                        sender: sender,
+                        message: message,
+                        offer_price: null
+                    })
+                });
 
                 if (!response.ok) {
-
-                    throw new Error(
-                        "Failed to send message"
-                    );
-
+                    throw new Error("Failed to send message");
                 }
 
-
                 input.value = "";
-
                 await loadMessages();
-
-
             } catch (error) {
-
                 console.error(error);
-
-                alert(
-                    "Could not send message."
-                );
-
+                alert("Could not send message.");
             }
-
         }
-
-        // ============================
-        // SEND OFFER
-        // ============================
 
         async function sendOffer() {
-
-            const input =
-                document.getElementById("offerInput");
-
-            const offer =
-                Number(input.value);
-
+            const input = document.getElementById("offerInput");
+            if (!input) return;
+            const offer = Number(input.value);
 
             if (!offer || offer <= 0) {
-
                 alert("Please enter a valid offer.");
-
                 return;
             }
 
+            const sender = getSenderName();
 
             try {
-
-                const response =
-                    await fetch("/messages", {
-
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-
-                            listing_id:
-                                Number(listingId),
-
-                            sender:
-                                "buyer",
-
-                            message:
-                                "I'd like to make an offer.",
-
-                            offer_price:
-                                offer
-
-                        })
-
-                    });
-
+                const response = await fetch("/messages", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        listing_id: Number(listingId),
+                        sender: sender,
+                        message: `Offered ₹${offer.toLocaleString("en-IN")}`,
+                        offer_price: offer
+                    })
+                });
 
                 if (!response.ok) {
-
-                    throw new Error(
-                        "Failed to send offer"
-                    );
-
+                    throw new Error("Failed to send offer");
                 }
-
 
                 input.value = "";
-
                 await loadMessages();
-
-
+                alert(`Offer of ₹${offer.toLocaleString("en-IN")} sent to seller!`);
             } catch (error) {
-
                 console.error(error);
-
                 alert("Could not send offer.");
-
             }
-
         }
 
-
         async function loadListing() {
-
             if (!listingId) {
-
-                document.getElementById(
-                    "listingDetails"
-                ).innerHTML =
+                document.getElementById("listingDetails").innerHTML =
                     "<p>Listing ID missing.</p>";
-
                 return;
             }
 
-
             try {
-
-                const response =
-                    await fetch(
-                        `/listings/${listingId}`
-                    );
-
-
+                const response = await fetch(`/listings/${listingId}`);
                 if (!response.ok) {
-
-                    throw new Error(
-                        "Listing not found"
-                    );
-
+                    throw new Error("Listing not found");
                 }
 
-
-                const item =
-                    await response.json();
-
-
+                const item = await response.json();
+                currentListing = item;
                 displayListing(item);
-
-
             } catch (error) {
-
-                document.getElementById(
-                    "listingDetails"
-                ).innerHTML = `
-
+                document.getElementById("listingDetails").innerHTML = `
                     <div class="error">
-
                         <h2>Listing not found</h2>
-
-                        <p>
-                            This listing may have been removed.
-                        </p>
-
+                        <p>This listing may have been removed or does not exist.</p>
                     </div>
-
                 `;
-
             }
-
         }
 
-
         function displayListing(item) {
-
             let emoji = "📦";
+            if (item.category === "Cycle") emoji = "🚲";
+            if (item.category === "Bike") emoji = "🏍️";
+            if (item.category === "Scooty") emoji = "🛵";
 
+            const imageContent = (item.image_url && item.image_url.trim() !== "")
+                ? `<img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.title)}" class="listing-photo" style="width:100%; height:100%; object-fit:contain; border-radius:14px;">`
+                : emoji;
 
-            if (item.category === "Cycle") {
-                emoji = "🚲";
-            }
-
-            if (item.category === "Bike") {
-                emoji = "🏍️";
-            }
-
-            if (item.category === "Scooty") {
-                emoji = "🛵";
-            }
-
-
-            document.getElementById(
-                "listingDetails"
-            ).innerHTML = `
-
-                <div class="details-image">
-
-                    ${
-                        item.image_url
-                        ? `<img
-                                src="${item.image_url}"
-                                alt="${item.title}"
-                                class="listing-photo"
-                        >`
-                        : emoji
-                    }
-
+            document.getElementById("listingDetails").innerHTML = `
+                <div class="details-image" style="overflow:hidden;">
+                    ${imageContent}
                 </div>
 
-
                 <div class="details-info">
-
                     <div class="card-category">
-
-                        ${item.category}
-
+                        ${escapeHtml(item.category)}
                     </div>
-
 
                     <h1>
-                        ${item.title}
+                        ${escapeHtml(item.title)}
                     </h1>
 
-
                     <div class="details-price">
-
-                        ₹${Number(item.price)
-                            .toLocaleString("en-IN")}
-
+                        ₹${Number(item.price).toLocaleString("en-IN")}
                     </div>
-
 
                     <div class="info-grid">
-
                         <div class="info-box">
-
-                            <span>
-                                CONDITION
-                            </span>
-
-                            <strong>
-                                ${item.condition}
-                            </strong>
-
+                            <span>CONDITION</span>
+                            <strong>${escapeHtml(item.condition || "Used")}</strong>
                         </div>
 
-
                         <div class="info-box">
-
-                            <span>
-                                PURCHASED
-                            </span>
-
-                            <strong>
-                                ${item.purchase_date}
-                            </strong>
-
+                            <span>PURCHASED</span>
+                            <strong>${escapeHtml(item.purchase_date || "N/A")}</strong>
                         </div>
-
                     </div>
-
 
                     <div class="description">
-
-                        <h3>
-                            Description
-                        </h3>
-
-                        <p>
-                            ${item.description}
-                        </p>
-
+                        <h3>Description</h3>
+                        <p>${escapeHtml(item.description || "No description provided.")}</p>
                     </div>
-
 
                     <div class="seller-box">
-
-                        <h3>Seller</h3>
-
-                        <p>
-                            👤 Seller:
-                            <span id="sellerName"></span>
-                        </p>
-
-                        <p>
-                            📍 Hostel:
-                            <span id="hostel"></span>
-                        </p>
-
-                        <p>
-                            📱 ${item.whatsapp}
-                        </p>
-
+                        <h3>Seller Information</h3>
+                        <p>👤 <strong>Seller:</strong> ${escapeHtml(item.seller_name || "Campus Student")}</p>
+                        <p>📍 <strong>Hostel:</strong> ${escapeHtml(item.hostel || "Pondicherry University")}</p>
+                        <p>📱 <strong>WhatsApp:</strong> ${escapeHtml(item.whatsapp || "N/A")}</p>
                     </div>
-
 
                     <div class="action-buttons">
-
-                        <button
-                            class="chat-btn"
-                            onclick="startChat()">
-
+                        <button class="chat-btn" onclick="startChat()">
                             💬 Chat with Seller
-
                         </button>
 
-
-                        <button
-                            class="whatsapp-btn"
-                            onclick="openWhatsApp(
-                                '${item.whatsapp}'
-                            )">
-
+                        <button class="whatsapp-btn" onclick="openWhatsApp('${escapeHtml(item.whatsapp)}')">
                             📱 WhatsApp Seller
-
                         </button>
-
                     </div>
 
-
                     <!-- CHAT WITH SELLER -->
-
                     <div class="chat-box">
-
-                        <h2>💬 Chat with Seller</h2>
-
+                        <h2>💬 Discussion & Offers</h2>
                         <div id="messages" class="messages">
-                            <p>Loading messages...</p>
+                            <p style="color:#777;">Loading messages...</p>
                         </div>
 
                         <div class="chat-input">
-
                             <input
                                 id="messageInput"
                                 type="text"
-                                placeholder="Ask the seller something..."
+                                placeholder="Ask a question or reply..."
+                                onkeydown="if(event.key==='Enter') sendMessage()"
                             >
-
-                            <button onclick="sendMessage()">
-                                Send
-                            </button>
-
+                            <button onclick="sendMessage()">Send</button>
                         </div>
-
                     </div>
 
                     <!-- MAKE AN OFFER -->
-
                     <div class="offer-box">
-
                         <h2>💰 Make an Offer</h2>
-
-                        <p>
-                            Think the price is negotiable?
-                            Make the seller an offer.
-                        </p>
+                        <p>Think the price is negotiable? Propose an offer to the seller.</p>
 
                         <div class="offer-input">
-
                             <span>₹</span>
-
                             <input
                                 id="offerInput"
                                 type="number"
                                 placeholder="Enter your offer"
+                                onkeydown="if(event.key==='Enter') sendOffer()"
                             >
-
-                            <button onclick="sendOffer()">
-                                Send Offer
-                            </button>
-
+                            <button onclick="sendOffer()">Send Offer</button>
                         </div>
-
                     </div>
-
                 </div>
-
             `;
-
         }
-
 
         function openWhatsApp(number) {
-
-            const message =
-                "Hi, I'm interested in your listing on CampusRide.";
-
-            const url =
-                `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-
+            const message = "Hi, I'm interested in your listing on CampusRide.";
+            const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
             window.open(url, "_blank");
-
         }
-
-
-        function makeOffer() {
-
-            const price =
-                document.getElementById(
-                    "offerPrice"
-                ).value;
-
-
-            if (!price) {
-
-                alert(
-                    "Please enter an offer price."
-                );
-
-                return;
-
-            }
-
-
-            alert(
-                `Offer of ₹${Number(price)
-                    .toLocaleString("en-IN")} sent!`
-            );
-
-        }
-
 
         function startChat() {
-
-            alert(
-                "Chat feature coming next!"
-            );
-
+            const chatBox = document.querySelector(".chat-box");
+            if (chatBox) {
+                chatBox.scrollIntoView({ behavior: "smooth" });
+                const input = document.getElementById("messageInput");
+                if (input) input.focus();
+            }
         }
 
+        async function init() {
+            await loadListing();
+            await loadMessages();
 
-        loadListing();
-        loadMessages();
+            if (typeof getCurrentUser === "function") {
+                const user = getCurrentUser();
+                if (user && user.role === "seller") {
+                    const sellerLink = document.getElementById("sellerLink");
+                    if (sellerLink) sellerLink.style.display = "inline-block";
+                }
+            }
+        }
 
+        init();
     </script>
-    <script src="/static/auth.js"></script>
 
 </body>
 

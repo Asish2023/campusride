@@ -41,12 +41,10 @@
 
         <form id="sellForm">
 
-            <!-- ITEM NAME -->
-
-            <label>Item Name</label>
-
+            <label for="title">Item Name</label>
             <input
                 id="title"
+                name="title"
                 type="text"
                 placeholder="Example: Hero Sprint Cycle"
                 required
@@ -284,129 +282,90 @@ document
 
 
         // --------------------------------
-        // Create listing object
+        // Upload photo and submit listing
         // --------------------------------
 
-        const listing = {
+        const submitBtn = event.target.querySelector("button[type='submit']");
+        const originalBtnText = submitBtn.textContent;
+        const resultEl = document.getElementById("result");
 
-            title:
-                document.getElementById("title").value,
-
-            category:
-                document.getElementById("category").value,
-
-            price:
-                Number(
-                    document.getElementById("price").value
-                ),
-
-            purchase_date:
-                document.getElementById("purchase_date").value,
-
-            condition:
-                document.getElementById("condition").value,
-
-            hostel:
-                document.getElementById("hostel").value,
-
-            description:
-                document.getElementById("description").value,
-
-            whatsapp:
-                user.whatsapp,
-
-            seller_name:
-                user.name,
-
-            seller_student_id:
-                user.student_id,
-
-            image_url:
-                ""
-
-        };
-
-
-        // --------------------------------
-        // Send listing to backend
-        // --------------------------------
+        resultEl.innerHTML = "";
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Uploading image...";
 
         try {
+            const imageInput = document.getElementById("image");
+            let imageUrl = "";
 
-            const response =
-                await fetch("/listings", {
+            if (imageInput.files && imageInput.files[0]) {
+                const imageFile = imageInput.files[0];
+                const imageFormData = new FormData();
+                imageFormData.append("file", imageFile);
 
+                const uploadRes = await fetch("/upload-image", {
                     method: "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
-
-                    body:
-                        JSON.stringify(listing)
-
+                    body: imageFormData
                 });
 
+                const uploadData = await uploadRes.json();
 
-            const data =
-                await response.json();
+                if (!uploadRes.ok) {
+                    throw new Error(uploadData.detail || "Image upload failed");
+                }
 
-
-            // --------------------------------
-            // Check response
-            // --------------------------------
-
-            if (!response.ok) {
-
-                throw new Error(
-                    data.detail ||
-                    "Could not create listing"
-                );
-
+                imageUrl = uploadData.image_url;
             }
 
+            submitBtn.textContent = "Publishing listing...";
 
-            // --------------------------------
-            // Success
-            // --------------------------------
+            const listing = {
+                title: document.getElementById("title").value.trim(),
+                category: document.getElementById("category").value,
+                price: Number(document.getElementById("price").value),
+                purchase_date: document.getElementById("purchase_date").value,
+                condition: document.getElementById("condition").value,
+                hostel: document.getElementById("hostel").value,
+                description: document.getElementById("description").value.trim(),
+                whatsapp: user.whatsapp,
+                seller_name: user.name,
+                seller_student_id: user.student_id,
+                image_url: imageUrl
+            };
 
-            document
-                .getElementById("result")
-                .innerHTML = `
-                    <span style="color: green;">
-                        ✅ Listing published successfully!
-                    </span>
-                `;
+            const response = await fetch("/listings", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(listing)
+            });
 
+            const data = await response.json();
 
-            // --------------------------------
-            // Open listing page
-            // --------------------------------
+            if (!response.ok) {
+                throw new Error(data.detail || "Could not create listing");
+            }
+
+            resultEl.innerHTML = `
+                <span style="color: #166534; font-weight: bold;">
+                    ✅ Listing published successfully! Redirecting...
+                </span>
+            `;
 
             setTimeout(() => {
-
-                window.location.href =
-                    `/listing.html?id=${data.listing_id}`;
-
-            }, 1000);
-
+                window.location.href = `/listing.html?id=${data.listing_id}`;
+            }, 800);
 
         } catch (error) {
-
             console.error(error);
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
 
-
-            document
-                .getElementById("result")
-                .innerHTML = `
-                    <span style="color: red;">
-                        ❌ ${error.message}
-                    </span>
-                `;
-
+            resultEl.innerHTML = `
+                <span style="color: #b91c1c; font-weight: bold;">
+                    ❌ ${error.message}
+                </span>
+            `;
         }
 
     });
