@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+campusride.db
+
+private_uploads/
+static/uploads/
+
+.vscode/

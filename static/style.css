@@ -1,0 +1,815 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f6f7fb;
+    color: #172033;
+}
+
+
+/* NAVBAR */
+
+.navbar {
+    height: 70px;
+    background: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 7%;
+
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #555;
+}
+
+.sell-btn {
+    background: #172033;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 11px 18px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+
+/* HERO */
+
+.hero {
+    background: #172033;
+    color: white;
+
+    padding: 75px 7%;
+}
+
+.hero-content {
+    max-width: 700px;
+}
+
+.small-title {
+    color: #9ca8bd;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    font-size: 54px;
+    line-height: 1.05;
+
+    margin-bottom: 20px;
+}
+
+.hero-text {
+    color: #c5cad4;
+
+    font-size: 18px;
+    line-height: 1.6;
+
+    max-width: 600px;
+
+    margin-bottom: 30px;
+}
+
+.primary-btn {
+    background: white;
+    color: #172033;
+
+    border: none;
+
+    padding: 14px 22px;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+/* MAIN */
+
+.container {
+    width: 86%;
+    max-width: 1200px;
+
+    margin: 45px auto;
+}
+
+.market-header h2 {
+    font-size: 30px;
+    margin-bottom: 7px;
+}
+
+.market-header p {
+    color: #777;
+}
+
+
+/* SEARCH */
+
+.search-box {
+    margin-top: 30px;
+
+    background: white;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+
+    padding: 15px 18px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.search-box input {
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    font-size: 16px;
+}
+
+
+/* CATEGORIES */
+
+.categories {
+    display: flex;
+
+    gap: 10px;
+
+    margin: 22px 0;
+}
+
+.category {
+    border: 1px solid #ddd;
+
+    background: white;
+
+    padding: 10px 17px;
+
+    border-radius: 20px;
+
+    cursor: pointer;
+}
+
+.category.active {
+    background: #172033;
+    color: white;
+}
+
+
+/* LISTINGS */
+
+.listings {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill, minmax(260px, 1fr));
+
+    gap: 22px;
+}
+
+
+/* CARD */
+
+.card {
+    background: white;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    border: 1px solid #e6e6e6;
+
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.08);
+}
+
+.card-image {
+    height: 180px;
+
+    background: #e9edf3;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 60px;
+}
+
+.card-content {
+    padding: 20px;
+}
+
+.card-category {
+    font-size: 12px;
+
+    color: #777;
+
+    text-transform: uppercase;
+
+    font-weight: bold;
+}
+
+.card h3 {
+    margin: 8px 0;
+
+    font-size: 20px;
+}
+
+.price {
+    font-size: 22px;
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}
+
+.condition {
+    color: #555;
+
+    margin-bottom: 15px;
+}
+
+.view-btn {
+    width: 100%;
+
+    padding: 11px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #172033;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+.loading {
+    color: #777;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .nav-links a {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 40px;
+    }
+
+    .navbar {
+        padding: 0 5%;
+    }
+
+    .container {
+        width: 90%;
+    }
+
+    .categories {
+        overflow-x: auto;
+    }
+}
+
+/* ============================= */
+/* LISTING DETAILS PAGE */
+/* ============================= */
+
+.details-container {
+    width: 86%;
+    max-width: 1100px;
+    margin: 40px auto;
+}
+
+.back-btn {
+    background: transparent;
+    border: none;
+    color: #555;
+    font-size: 15px;
+    cursor: pointer;
+    margin-bottom: 25px;
+}
+
+.listing-details {
+    background: white;
+    border-radius: 16px;
+    padding: 35px;
+
+    display: grid;
+    grid-template-columns: 42% 58%;
+    gap: 45px;
+
+    border: 1px solid #e5e5e5;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.details-image {
+    height: 420px;
+
+    background: #e9edf3;
+
+    border-radius: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 130px;
+}
+
+.details-info h1 {
+    font-size: 38px;
+    margin: 10px 0;
+}
+
+.details-price {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 15px 0 25px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.info-box {
+    background: #f6f7fb;
+    padding: 18px;
+    border-radius: 10px;
+}
+
+.info-box span {
+    display: block;
+    font-size: 11px;
+    color: #777;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.info-box strong {
+    font-size: 16px;
+}
+
+.description {
+    margin-top: 30px;
+}
+
+.description h3 {
+    margin-bottom: 10px;
+}
+
+.description p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.seller-box {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f6f7fb;
+    border-radius: 10px;
+}
+
+.seller-box h3 {
+    margin-bottom: 10px;
+}
+
+.seller-box p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.chat-btn,
+.whatsapp-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.chat-btn {
+    background: #172033;
+    color: white;
+}
+
+.whatsapp-btn {
+    background: #e8f5e9;
+    color: #267a31;
+}
+
+.offer-box {
+    margin-top: 30px;
+    padding: 25px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+}
+
+.offer-box h3 {
+    margin-bottom: 8px;
+}
+
+.offer-box p {
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.offer-input {
+    display: flex;
+    align-items: center;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    padding-left: 12px;
+    margin-bottom: 12px;
+}
+
+.offer-input input {
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 13px;
+    font-size: 16px;
+}
+
+.offer-btn {
+    width: 100%;
+    padding: 13px;
+
+    background: #172033;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 800px) {
+
+    .listing-details {
+        grid-template-columns: 1fr;
+    }
+
+    .details-image {
+        height: 280px;
+    }
+
+    .details-info h1 {
+        font-size: 30px;
+    }
+
+}
+
+/* ========================= */
+/* CHAT */
+/* ========================= */
+
+.chat-box {
+    margin-top: 30px;
+    background: white;
+    border: 1px solid #e1e4ea;
+    border-radius: 14px;
+    padding: 25px;
+}
+
+.chat-box h2 {
+    margin-top: 0;
+}
+
+.messages {
+    height: 280px;
+    overflow-y: auto;
+    background: #f5f6fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.message {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.message p {
+    margin: 5px 0 0;
+}
+
+.buyer-message {
+    margin-left: auto;
+    background: #172033;
+    color: white;
+}
+
+.seller-message {
+    background: white;
+    border: 1px solid #ddd;
+    color: #222;
+}
+
+.chat-input {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.chat-input button {
+    padding: 0 25px;
+    border: none;
+    border-radius: 8px;
+    background: #172033;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ========================= */
+/* MAKE OFFER */
+/* ========================= */
+
+.offer-box {
+    margin-top: 25px;
+    background: white;
+    border: 1px solid #e1e4ea;
+    border-radius: 14px;
+    padding: 25px;
+}
+
+.offer-box h2 {
+    margin-top: 0;
+}
+
+.offer-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.offer-input span {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.offer-input input {
+    flex: 1;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.offer-input button {
+    padding: 13px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #172033;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.dashboard-section {
+    margin-top: 30px;
+}
+
+.dashboard-card {
+    background: white;
+    border: 1px solid #e1e4ea;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 15px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-card h3 {
+    margin-top: 0;
+}
+
+.offer-card {
+    background: white;
+    border: 1px solid #e1e4ea;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.buyer-offer {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.offer-card button {
+    background: #172033;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.form-container {
+    max-width: 700px;
+    margin: 50px auto;
+    background: white;
+    padding: 35px;
+    border-radius: 16px;
+    border: 1px solid #e1e4ea;
+}
+
+.form-container h1 {
+    margin-top: 0;
+}
+
+.form-container label {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 7px;
+    font-weight: 600;
+}
+
+.form-container input,
+.form-container select,
+.form-container textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    border: 1px solid #d5d9e0;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.form-container textarea {
+    resize: vertical;
+}
+
+.form-container button {
+    margin-top: 25px;
+    width: 100%;
+}
+
+/* ========================= */
+/* LOGIN */
+/* ========================= */
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f5f6fa;
+}
+
+.login-card {
+    width: 420px;
+    max-width: 90%;
+    background: white;
+    padding: 40px;
+    border-radius: 18px;
+    border: 1px solid #e1e4ea;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    text-align: center;
+}
+
+.login-logo {
+    font-size: 45px;
+}
+
+.login-card h1 {
+    margin-bottom: 5px;
+}
+
+.login-subtitle {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.login-card label {
+    display: block;
+    text-align: left;
+    font-weight: 600;
+    margin-top: 18px;
+    margin-bottom: 7px;
+}
+
+.login-card input[type="text"],
+.login-card input[type="tel"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    border: 1px solid #d5d9e0;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.role-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.role-button {
+    flex: 1;
+    padding: 14px;
+    border: 1px solid #d5d9e0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.role-button.active {
+    background: #172033;
+    color: white;
+    border-color: #172033;
+}
+
+.login-button {
+    width: 100%;
+    margin-top: 25px;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: #172033;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.listing-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 14px;
+}

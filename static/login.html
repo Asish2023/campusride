@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CampusRide - Login</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #172033;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+            margin: 35px auto;
+            background: white;
+            border: 1px solid #dfe3ea;
+            border-radius: 24px;
+            padding: 38px 55px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo .bike {
+            font-size: 42px;
+        }
+
+        .logo h1 {
+            margin: 5px 0;
+            font-size: 40px;
+        }
+
+        .logo p {
+            margin: 0;
+            color: #666;
+            font-size: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 25px;
+            border: 1px solid #d7dce5;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: #172033;
+            color: white;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 17px;
+            margin: 18px 0 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccd2dc;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #172033;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .role-container {
+            display: flex;
+            gap: 12px;
+        }
+
+        .role-button {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ccd2dc;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .role-button.active {
+            background: #172033;
+            color: white;
+        }
+
+        .submit-button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 16px;
+            background: #172033;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            opacity: 0.9;
+        }
+
+        .message {
+            display: none;
+            padding: 13px;
+            border-radius: 10px;
+            margin-top: 18px;
+            font-weight: bold;
+        }
+
+        .success {
+            display: block;
+            background: #e8f8ed;
+            color: #166534;
+        }
+
+        .error {
+            display: block;
+            background: #fdecec;
+            color: #b91c1c;
+        }
+
+        .pending {
+            display: block;
+            background: #fff7df;
+            color: #92400e;
+        }
+
+        .file-label {
+            margin-top: 18px;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #172033;
+            text-decoration: none;
+        }
+
+        .required {
+            color: red;
+        }
+
+        @media(max-width: 650px) {
+            .container {
+                margin: 15px;
+                padding: 30px 22px;
+            }
+
+            .logo h1 {
+                font-size: 32px;
+            }
+
+            .logo p {
+                font-size: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">
+        <div class="bike">🚲</div>
+        <h1>CampusRide</h1>
+        <p>Pondicherry University Marketplace</p>
+    </div>
+
+    <!-- LOGIN / REGISTER TABS -->
+
+    <div class="tabs">
+        <button class="tab active" onclick="showSection('login')">
+            Login
+        </button>
+
+        <button class="tab" onclick="showSection('register')">
+            Register
+        </button>
+    </div>
+
+
+    <!-- ================= LOGIN ================= -->
+
+    <div id="loginSection" class="form-section active">
+
+        <form id="loginForm">
+
+            <label>
+                Student ID
+            </label>
+
+            <input
+                type="text"
+                id="loginStudentId"
+                placeholder="26MCA00PY0001"
+                required
+            >
+
+            <div class="hint">
+                Use your Pondicherry University student ID.
+            </div>
+
+
+            <label>
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Enter your password"
+                required
+            >
+
+
+            <button class="submit-button" type="submit">
+                Login to CampusRide
+            </button>
+
+        </form>
+
+        <div id="loginMessage" class="message"></div>
+
+    </div>
+
+
+    <!-- ================= REGISTER ================= -->
+
+    <div id="registerSection" class="form-section">
+
+        <form id="registerForm">
+
+            <label>
+                Your Name <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="registerName"
+                name="name"
+                placeholder="Enter your full name"
+                required
+            >
+
+
+            <label>
+                Student ID <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="registerStudentId"
+                name="student_id"
+                placeholder="26MCA00PY0001"
+                required
+            >
+
+            <div class="hint">
+                Allowed IDs: 26MCA00PY0001 to 26MCA00PY0081
+            </div>
+
+
+            <label>
+                WhatsApp Number <span class="required">*</span>
+            </label>
+
+            <input
+                type="tel"
+                id="registerWhatsapp"
+                name="whatsapp"
+                placeholder="9876543210"
+                required
+            >
+
+
+            <label>
+                Password <span class="required">*</span>
+            </label>
+
+            <input
+                type="password"
+                id="registerPassword"
+                name="password"
+                placeholder="Minimum 6 characters"
+                required
+            >
+
+
+            <label>
+                Confirm Password <span class="required">*</span>
+            </label>
+
+            <input
+                type="password"
+                id="confirmPassword"
+                placeholder="Enter password again"
+                required
+            >
+
+
+            <label>
+                I am a...
+            </label>
+
+            <div class="role-container">
+
+                <button
+                    type="button"
+                    class="role-button active"
+                    data-role="buyer"
+                    onclick="selectRole('buyer')">
+                    🛒 Buyer
+                </button>
+
+                <button
+                    type="button"
+                    class="role-button"
+                    data-role="seller"
+                    onclick="selectRole('seller')">
+                    🏪 Seller
+                </button>
+
+            </div>
+
+            <input
+                type="hidden"
+                id="role"
+                name="role"
+                value="buyer"
+            >
+
+
+            <label class="file-label">
+                Student ID Card / Mesh Card <span class="required">*</span>
+            </label>
+
+            <input
+                type="file"
+                id="idCard"
+                name="id_card"
+                accept="image/jpeg,image/png,image/webp,application/pdf"
+                required
+            >
+
+            <div class="hint">
+                JPG, PNG, WEBP or PDF — maximum 5 MB
+            </div>
+
+
+            <label class="file-label">
+                Admission Slip <span class="required">*</span>
+            </label>
+
+            <input
+                type="file"
+                id="admissionSlip"
+                name="admission_slip"
+                accept="image/jpeg,image/png,image/webp,application/pdf"
+                required
+            >
+
+            <div class="hint">
+                JPG, PNG, WEBP or PDF — maximum 5 MB
+            </div>
+
+
+            <label class="file-label">
+                Passport Photo <span class="required">*</span>
+            </label>
+
+            <input
+                type="file"
+                id="passportPhoto"
+                name="passport_photo"
+                accept="image/jpeg,image/png,image/webp"
+                required
+            >
+
+            <div class="hint">
+                JPG, PNG or WEBP — maximum 5 MB
+            </div>
+
+
+            <button class="submit-button" type="submit">
+                Submit Registration
+            </button>
+
+        </form>
+
+        <div id="registerMessage" class="message"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // =========================
+    // SWITCH LOGIN / REGISTER
+    // =========================
+
+    function showSection(section) {
+
+        const loginSection =
+            document.getElementById("loginSection");
+
+        const registerSection =
+            document.getElementById("registerSection");
+
+        const tabs =
+            document.querySelectorAll(".tab");
+
+        if (section === "login") {
+
+            loginSection.classList.add("active");
+            registerSection.classList.remove("active");
+
+            tabs[0].classList.add("active");
+            tabs[1].classList.remove("active");
+
+        } else {
+
+            loginSection.classList.remove("active");
+            registerSection.classList.add("active");
+
+            tabs[0].classList.remove("active");
+            tabs[1].classList.add("active");
+
+        }
+    }
+
+
+    // =========================
+    // SELECT BUYER / SELLER
+    // =========================
+
+    let selectedRole = "buyer";
+
+    function selectRole(role) {
+
+        selectedRole = role;
+
+        document.getElementById("role").value = role;
+
+        document.querySelectorAll(".role-button")
+            .forEach(button => {
+
+                button.classList.remove("active");
+
+                if (button.dataset.role === role) {
+                    button.classList.add("active");
+                }
+
+            });
+    }
+
+
+    // =========================
+    // STUDENT ID VALIDATION
+    // =========================
+
+    function validStudentId(studentId) {
+
+        const pattern =
+            /^26MCA00PY00(0[1-9]|[1-7][0-9]|81)$/;
+
+        return pattern.test(studentId);
+    }
+
+
+    // =========================
+    // LOGIN
+    // =========================
+
+    document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const studentId =
+                document
+                    .getElementById("loginStudentId")
+                    .value
+                    .trim()
+                    .toUpperCase();
+
+            const password =
+                document
+                    .getElementById("loginPassword")
+                    .value;
+
+            const message =
+                document.getElementById("loginMessage");
+
+            message.className = "message";
+            message.textContent = "";
+
+            if (!validStudentId(studentId)) {
+
+                message.classList.add("error");
+
+                message.textContent =
+                    "Invalid student ID. Use 26MCA00PY0001 to 26MCA00PY0081.";
+
+                return;
+            }
+
+            try {
+
+                const response = await fetch("/login", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        student_id: studentId,
+                        password: password
+                    })
+
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+
+                    message.classList.add("error");
+
+                    message.textContent =
+                        data.detail || "Login failed.";
+
+                    return;
+                }
+
+
+                // Save logged-in user
+
+                localStorage.setItem(
+                    "campusUser",
+                    JSON.stringify(data.user)
+                );
+
+
+                message.classList.add("success");
+
+                message.textContent =
+                    "Login successful! Redirecting...";
+
+
+                setTimeout(() => {
+
+                    if (data.user.role === "seller") {
+
+                        window.location.href =
+                            "/seller.html";
+
+                    } else {
+
+                        window.location.href =
+                            "/";
+
+                    }
+
+                }, 700);
+
+
+            } catch (error) {
+
+                message.classList.add("error");
+
+                message.textContent =
+                    "Cannot connect to CampusRide server.";
+
+            }
+
+        });
+
+
+    // =========================
+    // REGISTER
+    // =========================
+
+    document
+        .getElementById("registerForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const message =
+                document.getElementById("registerMessage");
+
+            message.className = "message";
+            message.textContent = "";
+
+
+            const studentId =
+                document
+                    .getElementById("registerStudentId")
+                    .value
+                    .trim()
+                    .toUpperCase();
+
+            const password =
+                document
+                    .getElementById("registerPassword")
+                    .value;
+
+            const confirmPassword =
+                document
+                    .getElementById("confirmPassword")
+                    .value;
+
+
+            // Student ID check
+
+            if (!validStudentId(studentId)) {
+
+                message.classList.add("error");
+
+                message.textContent =
+                    "Invalid student ID. Use 26MCA00PY0001 to 26MCA00PY0081.";
+
+                return;
+            }
+
+
+            // Password check
+
+            if (password.length < 6) {
+
+                message.classList.add("error");
+
+                message.textContent =
+                    "Password must be at least 6 characters.";
+
+                return;
+            }
+
+
+            if (password !== confirmPassword) {
+
+                message.classList.add("error");
+
+                message.textContent =
+                    "Passwords do not match.";
+
+                return;
+            }
+
+
+            // Create multipart form
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "name",
+                document.getElementById("registerName").value.trim()
+            );
+
+            formData.append(
+                "student_id",
+                studentId
+            );
+
+            formData.append(
+                "whatsapp",
+                document.getElementById("registerWhatsapp").value.trim()
+            );
+
+            formData.append(
+                "password",
+                password
+            );
+
+            formData.append(
+                "role",
+                selectedRole
+            );
+
+            formData.append(
+                "id_card",
+                document.getElementById("idCard").files[0]
+            );
+
+            formData.append(
+                "admission_slip",
+                document.getElementById("admissionSlip").files[0]
+            );
+
+            formData.append(
+                "passport_photo",
+                document.getElementById("passportPhoto").files[0]
+            );
+
+
+            try {
+
+                const response =
+                    await fetch("/register", {
+
+                        method: "POST",
+
+                        body: formData
+
+                    });
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    message.classList.add("error");
+
+                    message.textContent =
+                        data.detail || "Registration failed.";
+
+                    return;
+                }
+
+
+                message.classList.add("pending");
+
+                message.textContent =
+                    "Registration submitted successfully! Your account is waiting for verification.";
+
+
+                document
+                    .getElementById("registerForm")
+                    .reset();
+
+                selectedRole = "buyer";
+
+                document.getElementById("role").value =
+                    "buyer";
+
+                selectRole("buyer");
+
+
+            } catch (error) {
+
+                message.classList.add("error");
+
+                message.textContent =
+                    "Cannot connect to CampusRide server.";
+
+            }
+
+        });
+
+</script>
+<script src="/static/auth.js"></script>
+
+</body>
+</html>

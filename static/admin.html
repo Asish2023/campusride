@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CampusRide Admin</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #172033;
+        }
+
+        .header {
+            background: #172033;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0 0 5px;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .login-box {
+            max-width: 500px;
+            margin: 60px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .login-box h2 {
+            margin-top: 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ccd2dc;
+            border-radius: 9px;
+            font-size: 16px;
+            margin: 10px 0 15px;
+        }
+
+        button {
+            border: none;
+            border-radius: 9px;
+            padding: 12px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .primary {
+            width: 100%;
+            background: #172033;
+            color: white;
+        }
+
+        .approve {
+            background: #198754;
+            color: white;
+        }
+
+        .reject {
+            background: #dc3545;
+            color: white;
+        }
+
+        .document {
+            background: #e8edf5;
+            color: #172033;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+        }
+
+        .user-card h2 {
+            margin-top: 0;
+        }
+
+        .info {
+            line-height: 1.8;
+        }
+
+        .documents {
+            margin-top: 20px;
+        }
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .error {
+            display: block;
+            background: #fdecec;
+            color: #b91c1c;
+        }
+
+        .success {
+            display: block;
+            background: #e8f8ed;
+            color: #166534;
+        }
+
+        .empty {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 18px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="header">
+
+        <h1>🛡️ CampusRide Admin</h1>
+
+        <p>Student Verification Dashboard</p>
+
+    </div>
+
+
+    <!-- ADMIN LOGIN -->
+
+    <div
+        id="adminLogin"
+        class="login-box"
+    >
+
+        <h2>Admin Access</h2>
+
+        <p>
+            Enter the CampusRide admin key.
+        </p>
+
+        <input
+            id="adminKey"
+            type="password"
+            placeholder="Admin key"
+        >
+
+        <button
+            class="primary"
+            onclick="loginAdmin()"
+        >
+            Open Verification Dashboard
+        </button>
+
+        <div
+            id="loginMessage"
+            class="message"
+        ></div>
+
+    </div>
+
+
+    <!-- DASHBOARD -->
+
+    <div
+        id="dashboard"
+        class="container"
+        style="display:none;"
+    >
+
+        <h2>
+            Pending Registrations
+        </h2>
+
+        <div id="users">
+            Loading...
+        </div>
+
+    </div>
+
+
+<script>
+
+    let adminKey = "";
+
+
+    // =============================
+    // ADMIN LOGIN
+    // =============================
+
+    async function loginAdmin() {
+
+        adminKey =
+            document
+                .getElementById("adminKey")
+                .value
+                .trim();
+
+        const message =
+            document.getElementById("loginMessage");
+
+        if (!adminKey) {
+
+            message.className = "message error";
+
+            message.textContent =
+                "Please enter the admin key.";
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/admin/pending-users",
+                    {
+                        headers: {
+                            "X-Admin-Key": adminKey
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                message.className =
+                    "message error";
+
+                message.textContent =
+                    "Invalid admin key.";
+
+                return;
+            }
+
+
+            document
+                .getElementById("adminLogin")
+                .style.display = "none";
+
+            document
+                .getElementById("dashboard")
+                .style.display = "block";
+
+
+            const data =
+                await response.json();
+
+            displayUsers(data.users);
+
+
+        } catch (error) {
+
+            message.className =
+                "message error";
+
+            message.textContent =
+                "Cannot connect to CampusRide server.";
+
+        }
+
+    }
+
+
+    // =============================
+    // DISPLAY USERS
+    // =============================
+
+    function displayUsers(users) {
+
+        const container =
+            document.getElementById("users");
+
+        container.innerHTML = "";
+
+
+        if (users.length === 0) {
+
+            container.innerHTML = `
+                <div class="empty">
+                    <h2>🎉 No pending registrations</h2>
+                    <p>All student registrations have been processed.</p>
+                </div>
+            `;
+
+            return;
+        }
+
+
+        users.forEach(user => {
+
+            const card =
+                document.createElement("div");
+
+            card.className = "user-card";
+
+
+            card.innerHTML = `
+
+                <h2>
+                    ${escapeHtml(user.name)}
+                </h2>
+
+                <div class="info">
+
+                    <strong>Student ID:</strong>
+                    ${escapeHtml(user.student_id)}
+                    <br>
+
+                    <strong>WhatsApp:</strong>
+                    ${escapeHtml(user.whatsapp)}
+                    <br>
+
+                    <strong>Role:</strong>
+                    ${escapeHtml(user.role)}
+                    <br>
+
+                    <strong>Registered:</strong>
+                    ${escapeHtml(user.created_at)}
+
+                </div>
+
+
+                <div class="documents">
+
+                    <h3>Verification Documents</h3>
+
+                    <button
+                        class="document"
+                        onclick="viewDocument(
+                            ${user.id},
+                            'id_card'
+                        )"
+                    >
+                        🪪 View ID Card
+                    </button>
+
+                    <button
+                        class="document"
+                        onclick="viewDocument(
+                            ${user.id},
+                            'admission_slip'
+                        )"
+                    >
+                        📄 View Admission Slip
+                    </button>
+
+                    <button
+                        class="document"
+                        onclick="viewDocument(
+                            ${user.id},
+                            'passport_photo'
+                        )"
+                    >
+                        📷 View Passport Photo
+                    </button>
+
+                </div>
+
+
+                <div class="actions">
+
+                    <button
+                        class="approve"
+                        onclick="approveUser(${user.id})"
+                    >
+                        ✅ Approve
+                    </button>
+
+                    <button
+                        class="reject"
+                        onclick="rejectUser(${user.id})"
+                    >
+                        ❌ Reject
+                    </button>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(card);
+
+        });
+
+    }
+
+
+    // =============================
+    // VIEW DOCUMENT
+    // =============================
+
+    async function viewDocument(
+        userId,
+        documentType
+    ) {
+
+        try {
+
+            const response =
+                await fetch(
+                    `/admin/document/${userId}/${documentType}`,
+                    {
+                        headers: {
+                            "X-Admin-Key": adminKey
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                alert("Could not open document.");
+
+                return;
+            }
+
+
+            const blob =
+                await response.blob();
+
+            const url =
+                URL.createObjectURL(blob);
+
+
+            window.open(url, "_blank");
+
+        } catch (error) {
+
+            alert("Could not open document.");
+
+        }
+
+    }
+
+
+    // =============================
+    // APPROVE
+    // =============================
+
+    async function approveUser(userId) {
+
+        if (
+            !confirm(
+                "Approve this student?"
+            )
+        ) {
+            return;
+        }
+
+
+        const response =
+            await fetch(
+                `/admin/approve/${userId}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "X-Admin-Key": adminKey
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                "Could not approve user."
+            );
+
+            return;
+        }
+
+
+        alert(
+            "Student approved successfully!"
+        );
+
+
+        loadPendingUsers();
+
+    }
+
+
+    // =============================
+    // REJECT
+    // =============================
+
+    async function rejectUser(userId) {
+
+        if (
+            !confirm(
+                "Reject this registration?"
+            )
+        ) {
+            return;
+        }
+
+
+        const response =
+            await fetch(
+                `/admin/reject/${userId}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "X-Admin-Key": adminKey
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                "Could not reject user."
+            );
+
+            return;
+        }
+
+
+        alert(
+            "Registration rejected."
+        );
+
+
+        loadPendingUsers();
+
+    }
+
+
+    // =============================
+    // RELOAD
+    // =============================
+
+    async function loadPendingUsers() {
+
+        const response =
+            await fetch(
+                "/admin/pending-users",
+                {
+                    headers: {
+                        "X-Admin-Key": adminKey
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        displayUsers(data.users);
+
+    }
+
+
+    // =============================
+    // HTML SAFETY
+    // =============================
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+</script>
+
+</body>
+
+</html>

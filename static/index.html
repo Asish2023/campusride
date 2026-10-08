@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CampusRide</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🚲 CampusRide
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">
+                Marketplace
+            </a>
+
+            <span id="accountName"></span>
+
+            <a href="/login.html" id="loginLink">
+                My Account
+            </a>
+
+            <button
+                id="logoutButton"
+                onclick="logout()"
+                style="display: none;"
+            >
+                Logout
+            </button>
+
+            <button
+                class="sell-btn"
+                onclick="window.location.href='/sell.html'"
+            >
+                + Sell Something
+            </button>
+
+        </div>
+
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <p class="small-title">
+                PONDICHERRY UNIVERSITY MARKETPLACE
+            </p>
+
+            <h1>
+                Buy & Sell<br>
+                Within Your Campus.
+            </h1>
+
+            <p class="hero-text">
+                Bikes, scooters, cycles and more.
+                Find what you need without scrolling
+                through hundreds of WhatsApp messages.
+            </p>
+
+            <button class="primary-btn">
+                Browse Marketplace
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- MARKETPLACE -->
+    <main class="container">
+
+        <div class="market-header">
+
+            <div>
+                <h2>Campus Marketplace</h2>
+
+                <p>
+                    Find items being sold by fellow students.
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <div class="search-box">
+
+            <span>🔍</span>
+
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Search bikes, cycles, scooters..."
+            >
+
+        </div>
+
+
+        <!-- CATEGORIES -->
+
+        <div class="categories">
+
+            <button class="category active" data-category="All">
+                All
+            </button>
+
+            <button class="category" data-category="Bike">
+                🏍️ Bikes
+            </button>
+
+            <button class="category" data-category="Scooty">
+                🛵 Scooters
+            </button>
+
+            <button class="category" data-category="Cycle">
+                🚲 Cycles
+            </button>
+
+            <button class="category" data-category="Other">
+                📦 Other
+            </button>
+
+        </div>
+
+
+        <!-- LISTINGS -->
+
+        <div id="listings" class="listings">
+
+            <p class="loading">
+                Loading listings...
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <script src="/static/app.js"></script>
+    <script src="/static/auth.js"></script>
+
+</body>
+
+</html>
